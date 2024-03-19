@@ -1,0 +1,58 @@
+application:
+  title: Vendedor API
+  version: 1.0.0
+
+server:
+  port: 8099
+  servlet:
+    context-path: /api/v1
+    encoding:
+      charset: utf-8
+      enabled: true
+
+spring:
+  application:
+    name: vendedor-api
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driverClassName: org.h2.Driver
+    username: sa
+    password:
+    hikari:
+      pool-name: vendedor-pool
+      connection-timeout: 20000
+      minimum-idle: 1
+      maximum-pool-size: 10
+      idle-timeout: 10000
+      max-lifetime: 600000
+      auto-commit: true
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  jackson:
+    serialization:
+      fail-on-empty-beans: false
+  banner:
+    location: static/banner.txt
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+logging:
+  level:
+    root: info
+    web: debug
+    sql: info
+    org.springframework: info
+    org.hibernate: INFO
+
+security:
+  jwt:
+    token:
+      secret-key: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+      expiration: 86400000 # a day
+      refresh-token:
+        expiration: 604800000 # 7 days
