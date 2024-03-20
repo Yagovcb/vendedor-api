@@ -62,7 +62,6 @@ public class Vendedor implements Serializable {
     private TipoContracao tipoContratacao;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JsonIgnoreProperties(value = { "vendedors" }, allowSetters = true)
     private Filial filial;
 
     @Override

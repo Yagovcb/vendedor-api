@@ -15,9 +15,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @Getter
 @Setter
@@ -70,21 +68,13 @@ public class Filial implements Serializable {
     @Column(name = "ultima_atualizacao")
     private LocalDate ultimaAtualizacao;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "filial")
-    @JsonIgnoreProperties(value = {"filial"}, allowSetters = true)
-    private Set<Vendedor> vendedores = new HashSet<>();
-
-    public Filial addVendedor(Vendedor vendedor) {
-        this.vendedores.add(vendedor);
-        vendedor.setFilial(this);
-        return this;
-    }
-
-    public Filial removeVendedor(Vendedor vendedor) {
-        this.vendedores.remove(vendedor);
-        vendedor.setFilial(null);
-        return this;
-    }
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "filial_vendedores",
+            joinColumns = @JoinColumn(name = "filial_id"),
+            inverseJoinColumns = @JoinColumn(name = "vendedor_id")
+    )
+    private List<Vendedor> vendedores;
 
     public String getCnpj() {
         return formatarCNPJ(cnpj);

@@ -2,7 +2,6 @@ package br.com.yagovcb.vendedorapi.config.component;
 
 import br.com.yagovcb.vendedorapi.application.enums.APIExceptionCode;
 import br.com.yagovcb.vendedorapi.application.exceptions.IntegrationException;
-import br.com.yagovcb.vendedorapi.application.service.VendedorService;
 import br.com.yagovcb.vendedorapi.domain.enums.Role;
 import br.com.yagovcb.vendedorapi.domain.enums.TipoFilial;
 import br.com.yagovcb.vendedorapi.domain.model.Filial;
@@ -18,7 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -65,7 +64,7 @@ public class InicializaObjetodsDefault {
                 .ativo(Boolean.TRUE)
                 .dataCadastro(LocalDate.now())
                 .ultimaAtualizacao(LocalDate.now())
-                .vendedores(new HashSet<>())
+                .vendedores(new ArrayList<>())
                 .build();
         Filial filial2 = Filial.builder()
                 .nome("Empresa de teste 2")
@@ -76,7 +75,7 @@ public class InicializaObjetodsDefault {
                 .ativo(Boolean.TRUE)
                 .dataCadastro(LocalDate.now())
                 .ultimaAtualizacao(LocalDate.now())
-                .vendedores(new HashSet<>())
+                .vendedores(new ArrayList<>())
                 .build();
 
         Filial filial3 = Filial.builder()
@@ -88,7 +87,7 @@ public class InicializaObjetodsDefault {
                 .ativo(Boolean.TRUE)
                 .dataCadastro(LocalDate.now())
                 .ultimaAtualizacao(LocalDate.now())
-                .vendedores(new HashSet<>())
+                .vendedores(new ArrayList<>())
                 .build();
         try {
             log.info("Iniciando a persistencia das filiais default");

@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,9 +57,13 @@ public class FilialIntegrationService {
         return ResponseEntity.ok(response);
     }
 
+    @Transactional
     public void atualizaFilialVendedor(Vendedor vendedor, Filial filial) {
         log.info("FilialIntegrationService :: Atualizando lista de vendedores da filial");
-        filial.addVendedor(vendedor);
+        if (filial.getVendedores().isEmpty()){
+            filial.setVendedores(new ArrayList<>());
+        }
+        filial.getVendedores().add(vendedor);
         try {
             filialRepository.save(filial);
             log.info("FilialIntegrationService :: Filial atualizada com sucesso!");
