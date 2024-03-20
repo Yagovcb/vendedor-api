@@ -46,6 +46,7 @@ public class VendedorUtils {
                 .documento(cadastroVendedorRequest.getDocumento())
                 .email(cadastroVendedorRequest.getEmail())
                 .tipoContratacao(cadastroVendedorRequest.getTipoContratacao())
+                .filial(filial)
                 .build();
     }
 
