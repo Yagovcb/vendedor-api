@@ -4,7 +4,6 @@ import br.com.yagovcb.vendedorapi.domain.enums.TipoContracao;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Size;
@@ -29,14 +28,14 @@ public class Vendedor implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
-    @SequenceGenerator(name = "sequenceGenerator")
-    @Column(name = "id", unique = true)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "vendedor_seq")
+    @SequenceGenerator(name = "vendedor_seq")
+    @Column(name = "id")
     private Long id;
 
     @NotNull
     @Size(min = 5, max = 15)
-    @Column(name = "matricula", length = 15, unique = true, nullable = false)
+    @Column(name = "matricula", length = 15, unique = true)
     private String matricula;
 
     @NotNull

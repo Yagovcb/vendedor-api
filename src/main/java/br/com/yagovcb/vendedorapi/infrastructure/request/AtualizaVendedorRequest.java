@@ -23,7 +23,4 @@ public class AtualizaVendedorRequest {
 
     @JsonProperty(value = "email")
     private String email;
-
-    @JsonProperty(value = "tipo_contratacao")
-    private TipoContracao tipoContratacao;
 }

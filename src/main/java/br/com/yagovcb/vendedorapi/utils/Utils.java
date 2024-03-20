@@ -1,18 +1,14 @@
 package br.com.yagovcb.vendedorapi.utils;
 
 import br.com.yagovcb.vendedorapi.application.dto.TokenDTO;
-import br.com.yagovcb.vendedorapi.domain.model.Usuario;
+import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
 
-import java.time.LocalDate;
+import java.util.Objects;
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Utils {
-    public static Usuario getJwtUser() {
-        return (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    }
 
     public static TokenDTO getTokenDTOBuilder(String accessToken, String refreshToken, String username){
         return TokenDTO.builder()
@@ -21,4 +17,9 @@ public class Utils {
                 .refreshToken(refreshToken)
                 .build();
     }
+
+    public static Object validaNaoNulo(Object o1, Object o2){
+        return Objects.nonNull(o1) ? o1 : o2;
+    }
+
 }

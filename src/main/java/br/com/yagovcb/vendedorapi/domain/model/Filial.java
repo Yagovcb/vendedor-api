@@ -32,9 +32,9 @@ public class Filial implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
-    @SequenceGenerator(name = "sequenceGenerator")
-    @Column(name = "id", unique = true)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "filial_seq")
+    @SequenceGenerator(name = "filial_seq")
+    @Column(name = "id")
     private Long id;
 
     @Column(name = "nome")

@@ -16,9 +16,6 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CadastroVendedorRequest {
-    @Size(min = 5, max = 15)
-    @JsonProperty(value = "matricula")
-    private String matricula;
 
     @JsonProperty(value = "nome")
     private String nome;
