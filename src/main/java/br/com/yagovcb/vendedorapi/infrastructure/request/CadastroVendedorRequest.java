@@ -32,4 +32,7 @@ public class CadastroVendedorRequest {
 
     @JsonProperty(value = "tipo_contratacao")
     private TipoContracao tipoContratacao;
+
+    @JsonProperty(value = "filial_cnpj")
+    private String filialCnpj;
 }

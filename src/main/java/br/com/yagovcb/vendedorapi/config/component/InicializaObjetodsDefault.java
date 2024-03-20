@@ -58,7 +58,7 @@ public class InicializaObjetodsDefault {
         }
         Filial filial1 = Filial.builder()
                 .nome("Empresa de teste 1")
-                .cnpj("83.317.843/0001-43")
+                .cnpj("83317843000143")
                 .cidade("Belém")
                 .uf("PA")
                 .tipo(TipoFilial.DEPOSITO)
@@ -69,7 +69,7 @@ public class InicializaObjetodsDefault {
                 .build();
         Filial filial2 = Filial.builder()
                 .nome("Empresa de teste 2")
-                .cnpj("54.761.418/0001-40")
+                .cnpj("54761418000140")
                 .cidade("Rio de Janeiro")
                 .uf("RJ")
                 .tipo(TipoFilial.LOJA)
@@ -81,7 +81,7 @@ public class InicializaObjetodsDefault {
 
         Filial filial3 = Filial.builder()
                 .nome("Empresa de teste 3")
-                .cnpj("32.094.992/0001-50")
+                .cnpj("32094992000150")
                 .cidade("São Paulo")
                 .uf("SP")
                 .tipo(TipoFilial.SHOPPING)

@@ -86,6 +86,22 @@ public class Filial implements Serializable {
         return this;
     }
 
+    public String getCnpj() {
+        return formatarCNPJ(cnpj);
+    }
+
+    public void setCnpj(String cnpj) {
+        this.cnpj = desformatarCNPJ(cnpj);
+    }
+
+    public static String formatarCNPJ(String cnpj) {
+        return cnpj.replaceAll("(\\d{2})(\\d{3})(\\d{3})(\\d{4})(\\d{2})", "$1.$2.$3/$4-$5");
+    }
+
+    public static String desformatarCNPJ(String cnpj) {
+        return cnpj.replaceAll(".","").replace("/", "").replace("-", "");
+    }
+
     @Override
     public final boolean equals(Object o) {
         if (this == o) return true;

@@ -62,6 +62,7 @@ public class SecurityConfig {
 							.requestMatchers(whiteList).permitAll()
 							.requestMatchers(AUTH_WHITELIST).permitAll()
 							.requestMatchers(HttpMethod.POST, "/vendedor/**").authenticated()
+							.requestMatchers(HttpMethod.GET, "/filial/**").authenticated()
 							.anyRequest().authenticated()
 				)
 				.authenticationProvider(authenticationProvider)

@@ -2,6 +2,7 @@ package br.com.yagovcb.vendedorapi.application.service;
 
 import br.com.yagovcb.vendedorapi.application.enums.APIExceptionCode;
 import br.com.yagovcb.vendedorapi.application.exceptions.IntegrationException;
+import br.com.yagovcb.vendedorapi.domain.model.Filial;
 import br.com.yagovcb.vendedorapi.infrastructure.integration.response.FilialResponse;
 import br.com.yagovcb.vendedorapi.infrastructure.integration.service.FilialIntegrationService;
 import br.com.yagovcb.vendedorapi.utils.VendedorUtils;
@@ -16,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -29,6 +31,7 @@ public class VendedorService {
 
     private final VendedorRepository vendedorRepository;
     private final FilialIntegrationService filialIntegrationService;
+    private final CadastroVendedorStatusService cadastroVendedorStatusService;
 
     public ResponseEntity<List<VendedorResponse>> findAll() {
         List<Vendedor> vendedorList = vendedorRepository.findAll();
@@ -51,23 +54,27 @@ public class VendedorService {
         return ResponseEntity.ok(VendedorUtils.montaVendedorResponse(vendedor, filialResponse.getNome()));
     }
 
-    public ResponseEntity<VendedorResponse> cadastra(CadastroVendedorRequest cadastroVendedorRequest) {
+    @Async
+    public void cadastra(CadastroVendedorRequest cadastroVendedorRequest) {
+        Long id = cadastroVendedorStatusService.cadastraStatusNovo(cadastroVendedorRequest.getDocumento());
         log.info("VendedorService :: Iniciando criação do vendedor na base...");
         log.info("VendedorService :: Iniciando validação do email...");
         VendedorUtils.validaEmail(cadastroVendedorRequest.getEmail());
         log.info("VendedorService :: Email validado, seguindo fluxo da API...");
         try {
-            Vendedor vendedor = VendedorUtils.montaVendedorDefault(cadastroVendedorRequest);
+            Filial filial = filialIntegrationService.findByCnpj(cadastroVendedorRequest.getFilialCnpj());
+            Vendedor vendedor = VendedorUtils.montaVendedorDefault(cadastroVendedorRequest,filial);
             log.info("VendedorService :: Vendedor criado, iniciando geração da matricula");
             vendedorRepository.save(vendedor);
             log.info("VendedorService :: Persistencia inicial do objeto...");
             VendedorUtils.geraMatriculaVendedor(vendedor);
             log.info("VendedorService :: Matricula gerada, atualizando objeto...");
             vendedorRepository.updateMatricula(vendedor.getId(), vendedor.getMatricula());
+            filialIntegrationService.atualizaFilialVendedor(vendedor, filial);
             log.info("VendedorService :: Fluxo finalizado!");
-            FilialResponse filialResponse = retornaFilialResponse(vendedor.getFilial().getId());
-            return ResponseEntity.status(HttpStatus.CREATED).body(VendedorUtils.montaVendedorResponse(vendedor, filialResponse.getNome()));
+            cadastroVendedorStatusService.atualizaCadastroStatus(id, "Completo", "Cadastro do vendedor concluído");
         } catch (IntegrationException e) {
+            cadastroVendedorStatusService.atualizaCadastroStatus(id, "Error", e.getMessage());
             throw new IntegrationException(APIExceptionCode.UNKNOWN, e.getMessage());
         }
     }

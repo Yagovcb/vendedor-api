@@ -4,6 +4,7 @@ import br.com.yagovcb.vendedorapi.application.enums.APIExceptionCode;
 import br.com.yagovcb.vendedorapi.application.exceptions.EmailException;
 import br.com.yagovcb.vendedorapi.application.polices.PoliticaValidacaoEmail;
 import br.com.yagovcb.vendedorapi.domain.enums.TipoContracao;
+import br.com.yagovcb.vendedorapi.domain.model.Filial;
 import br.com.yagovcb.vendedorapi.domain.model.Vendedor;
 import br.com.yagovcb.vendedorapi.infrastructure.request.AtualizaVendedorRequest;
 import br.com.yagovcb.vendedorapi.infrastructure.request.CadastroVendedorRequest;
@@ -37,9 +38,10 @@ public class VendedorUtils {
         }
     }
 
-    public static Vendedor montaVendedorDefault(CadastroVendedorRequest cadastroVendedorRequest) {
+    public static Vendedor montaVendedorDefault(CadastroVendedorRequest cadastroVendedorRequest, Filial filial) {
         return Vendedor.builder()
                 .nome(cadastroVendedorRequest.getNome())
+                .matricula("ValorDefault")
                 .dataNascimento(cadastroVendedorRequest.getDataNascimento())
                 .documento(cadastroVendedorRequest.getDocumento())
                 .email(cadastroVendedorRequest.getEmail())
