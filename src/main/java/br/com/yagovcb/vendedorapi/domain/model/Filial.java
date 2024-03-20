@@ -71,7 +71,7 @@ public class Filial implements Serializable {
     private LocalDate ultimaAtualizacao;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "filial")
-    @JsonIgnoreProperties(value = { "filial" }, allowSetters = true)
+    @JsonIgnoreProperties(value = {"filial"}, allowSetters = true)
     private Set<Vendedor> vendedores = new HashSet<>();
 
     public Filial addVendedor(Vendedor vendedor) {
@@ -99,7 +99,10 @@ public class Filial implements Serializable {
     }
 
     public static String desformatarCNPJ(String cnpj) {
-        return cnpj.replaceAll(".","").replace("/", "").replace("-", "");
+        cnpj = cnpj.replace(".", "")
+                .replace("/", "")
+                .replace("-", "");
+        return cnpj;
     }
 
     @Override
