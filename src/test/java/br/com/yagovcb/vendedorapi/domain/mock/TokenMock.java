@@ -10,8 +10,8 @@ public class TokenMock {
                 .id(1L)
                 .token("Token")
                 .tokenType("BAREAR")
-                .revoked(true)
-                .expired(true)
+                .revoked(false)
+                .expired(false)
                 .user(usuario)
                 .build();
     }

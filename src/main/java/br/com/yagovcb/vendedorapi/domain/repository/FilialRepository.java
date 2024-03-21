@@ -12,6 +12,4 @@ import java.util.Optional;
 public interface FilialRepository extends JpaRepository<Filial, Long> {
     Optional<Filial> findByCnpj(String cnpj);
 
-    @Query(value = "select f from Filial f join f.vendedores v where f.cnpj = :cnpj")
-    Filial findFilialComVendedores(@Param("cnpj") String cnpj);
 }

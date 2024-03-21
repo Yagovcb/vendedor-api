@@ -19,7 +19,7 @@ public class UsuarioMock {
                 .roles(Set.of(Role.ROLE_USER))
                 .credentialsNonExpired(true)
                 .accountNonLocked(true)
-                .accountNonLocked(true)
+                .accountNonExpired(true)
                 .build();
     }
 
@@ -33,9 +33,21 @@ public class UsuarioMock {
                 .roles(new HashSet<>())
                 .credentialsNonExpired(true)
                 .accountNonLocked(true)
-                .accountNonLocked(true)
+                .accountNonExpired(true)
                 .build();
     }
 
-
+    public static Usuario getUsuarioWithFullRoleMock(){
+        return Usuario.builder()
+                .id(1L)
+                .username("janedoe")
+                .senha("Senha")
+                .ativo(true)
+                .dataCadastro(LocalDate.now())
+                .roles(Set.of(Role.ROLE_USER, Role.ROLE_ADMIN))
+                .credentialsNonExpired(true)
+                .accountNonLocked(true)
+                .accountNonExpired(true)
+                .build();
+    }
 }

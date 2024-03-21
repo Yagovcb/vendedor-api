@@ -25,10 +25,10 @@ public class Utils {
         return cnpj.replaceAll("(\\d{2})(\\d{3})(\\d{3})(\\d{4})(\\d{2})", "$1.$2.$3/$4-$5");
     }
 
-    public static String desformatarDocumento(String cnpj) {
-        cnpj = cnpj.replace(".", "")
+    public static String desformatarDocumento(String documento) {
+        documento = documento.replace(".", "")
                 .replace("/", "")
                 .replace("-", "");
-        return cnpj;
+        return documento;
     }
 }
