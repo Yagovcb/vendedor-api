@@ -3,7 +3,6 @@ package br.com.yagovcb.vendedorapi.application.service;
 import br.com.yagovcb.vendedorapi.application.enums.APIExceptionCode;
 import br.com.yagovcb.vendedorapi.application.exceptions.InvalidJwtAuthenticationException;
 import br.com.yagovcb.vendedorapi.application.exceptions.UserNotFoundException;
-import br.com.yagovcb.vendedorapi.application.exceptions.ValidaSenhaException;
 import br.com.yagovcb.vendedorapi.domain.model.Token;
 import br.com.yagovcb.vendedorapi.domain.model.Usuario;
 import br.com.yagovcb.vendedorapi.domain.repository.TokenRepository;
@@ -16,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 
@@ -32,8 +30,7 @@ public class AuthenticationServices {
     private final TokenRepository tokenRepository;
     private final JwtService jwtService;
 
-    public ResponseEntity<TokenDTO> singIn(AccountCredentialsDTO accountCredentialsDTO) {
-        try {
+    public ResponseEntity<TokenDTO> signIn(AccountCredentialsDTO accountCredentialsDTO) {
             var username = accountCredentialsDTO.getUsername();
             var password = accountCredentialsDTO.getPassword();
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
@@ -47,9 +44,6 @@ public class AuthenticationServices {
             } else {
                 throw new UserNotFoundException(APIExceptionCode.RESOURCE_NOT_FOUND, "User com username: " + username + ", não encontrado!");
             }
-        } catch (BadCredentialsException e) {
-            throw new ValidaSenhaException(APIExceptionCode.PASSWORD_VALIDATION, "Usuario ou senha inválida");
-        }
     }
 
     public ResponseEntity<TokenDTO> refreshToken(HttpServletRequest request, HttpServletResponse response) {

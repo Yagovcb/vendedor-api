@@ -21,7 +21,7 @@ public class AuthenticationController {
 
     @PostMapping(value = "/signin", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<TokenDTO> singIn(@RequestBody AccountCredentialsDTO accountCredentialsDTO) {
-        return authenticationServices.singIn(accountCredentialsDTO);
+        return authenticationServices.signIn(accountCredentialsDTO);
     }
 
     @PostMapping(value = "/refresh", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
