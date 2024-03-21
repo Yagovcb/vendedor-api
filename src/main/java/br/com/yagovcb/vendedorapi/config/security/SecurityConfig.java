@@ -28,71 +28,66 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-	private final JwtAuthenticationFilter jwtAuthFilter;
-	private final AuthenticationProvider authenticationProvider;
+    private final JwtAuthenticationFilter jwtAuthFilter;
+    private final AuthenticationProvider authenticationProvider;
 
-	private final String[] whiteList = {
-			"/auth/**",
-			"/configuration/ui",
-			"/configuration/security",
-			"/webjars/**",
-			"/stays-webhook"
-	};
+    private static final String[] AUTH_WHITELIST = {
+            "/auth/**",
+            "/swagger-ui/index.html",
+            "/swagger-ui/swagger-initializer.js",
+            "/v3/api-docs/**",
+            "/v3/api-docs.yaml",
+            "/swagger-ui/**",
+            "/swagger-ui.html",
+            "/docs",
+            "/configuration/ui",
+            "/configuration/security",
+            "/webjars/**",
+            "/stays-webhook",
+            "/docs-ui"
+    };
 
-	private static final String[] AUTH_WHITELIST = {
-			"/auth/**",
-			"/swagger-ui/index.html",
-			"/swagger-ui/swagger-initializer.js",
-			"/v3/api-docs/**",
-			"/v3/api-docs.yaml",
-			"/swagger-ui/**",
-			"/swagger-ui.html",
-			"/docs",
-			"/docs-ui"
-	};
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+                .csrf(AbstractHttpConfigurer::disable)
+                .sessionManagement(c -> c.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .cors(getCorsConfigurerCustomizer())
+                .authorizeHttpRequests(auth ->
+                        auth
+                                .requestMatchers(AUTH_WHITELIST).permitAll()
+                                .requestMatchers(HttpMethod.POST, "/vendedor/**").authenticated()
+                                .requestMatchers(HttpMethod.GET, "/filial/**").authenticated()
+                                .anyRequest().authenticated()
+                )
+                .authenticationProvider(authenticationProvider)
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .httpBasic(withDefaults())
+                .formLogin(withDefaults())
+                .authenticationProvider(authenticationProvider)
+                .logout(LogoutConfigurer::permitAll);
 
-	@Bean
-	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		http
-				.csrf(AbstractHttpConfigurer::disable)
-				.sessionManagement(c -> c.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-				.cors(getCorsConfigurerCustomizer())
-				.authorizeHttpRequests(auth ->
-					auth
-							.requestMatchers(whiteList).permitAll()
-							.requestMatchers(AUTH_WHITELIST).permitAll()
-							.requestMatchers(HttpMethod.POST, "/vendedor/**").authenticated()
-							.requestMatchers(HttpMethod.GET, "/filial/**").authenticated()
-							.anyRequest().authenticated()
-				)
-				.authenticationProvider(authenticationProvider)
-				.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-				.httpBasic(withDefaults())
-				.formLogin(withDefaults())
-				.authenticationProvider(authenticationProvider)
-				.logout(LogoutConfigurer::permitAll);
+        return http.build();
+    }
 
-		return http.build();
-	}
+    private static Customizer<CorsConfigurer<HttpSecurity>> getCorsConfigurerCustomizer() {
+        return c -> c.configurationSource(request -> {
+            CorsConfiguration configuration = new CorsConfiguration();
+            configuration.setAllowedOriginPatterns(List.of("http://localhost:[*]", "https://*.xtay.com.br"));
+            configuration.setAllowedMethods(List.of("GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS", "HEAD", "TRACE", "CONNECT"));
+            configuration.setMaxAge(3600L);
+            configuration.setAllowCredentials(true);
+            configuration.setAllowedHeaders(List.of("Requestor-Type", "Origin", "Content-Type", "Accept", "Authorization", "Access-Control-Allow-Origin", "Access-Control-Request-Method"));
+            configuration.setExposedHeaders(List.of("X-Get-Header", "Access-Control-Allow-Origin", "Access-Control-Request-Method"));
+            UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+            source.registerCorsConfiguration("/**", configuration);
+            return configuration;
+        });
+    }
 
-	private static Customizer<CorsConfigurer<HttpSecurity>> getCorsConfigurerCustomizer() {
-		return c -> c.configurationSource(request -> {
-			CorsConfiguration configuration = new CorsConfiguration();
-			configuration.setAllowedOriginPatterns(List.of("http://localhost:[*]", "https://*.xtay.com.br"));
-			configuration.setAllowedMethods(List.of("GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS", "HEAD", "TRACE", "CONNECT"));
-			configuration.setMaxAge(3600L);
-			configuration.setAllowCredentials(true);
-			configuration.setAllowedHeaders(List.of("Requestor-Type", "Origin", "Content-Type", "Accept", "Authorization", "Access-Control-Allow-Origin", "Access-Control-Request-Method"));
-			configuration.setExposedHeaders(List.of("X-Get-Header", "Access-Control-Allow-Origin", "Access-Control-Request-Method"));
-			UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-			source.registerCorsConfiguration("/**", configuration);
-			return configuration;
-		});
-	}
-
-	@Bean
-	public WebSecurityCustomizer webSecurityCustomizer() {
-		return web -> web.ignoring().requestMatchers(whiteList);
-	}
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return web -> web.ignoring().requestMatchers(AUTH_WHITELIST);
+    }
 
 }

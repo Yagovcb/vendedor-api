@@ -2,11 +2,8 @@ package br.com.yagovcb.vendedorapi.domain.model;
 
 import br.com.yagovcb.vendedorapi.domain.enums.TipoFilial;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.FutureOrPresent;
-import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
@@ -16,6 +13,9 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.*;
+
+import static br.com.yagovcb.vendedorapi.utils.Utils.desformatarDocumento;
+import static br.com.yagovcb.vendedorapi.utils.Utils.formatarCNPJ;
 
 @Getter
 @Setter
@@ -81,19 +81,9 @@ public class Filial implements Serializable {
     }
 
     public void setCnpj(String cnpj) {
-        this.cnpj = desformatarCNPJ(cnpj);
+        this.cnpj = desformatarDocumento(cnpj);
     }
 
-    public static String formatarCNPJ(String cnpj) {
-        return cnpj.replaceAll("(\\d{2})(\\d{3})(\\d{3})(\\d{4})(\\d{2})", "$1.$2.$3/$4-$5");
-    }
-
-    public static String desformatarCNPJ(String cnpj) {
-        cnpj = cnpj.replace(".", "")
-                .replace("/", "")
-                .replace("-", "");
-        return cnpj;
-    }
 
     @Override
     public final boolean equals(Object o) {

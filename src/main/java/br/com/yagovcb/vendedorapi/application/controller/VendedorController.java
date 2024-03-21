@@ -1,10 +1,15 @@
 package br.com.yagovcb.vendedorapi.application.controller;
 
+import br.com.yagovcb.vendedorapi.application.enums.APIExceptionCode;
+import br.com.yagovcb.vendedorapi.application.exceptions.BusinessException;
+import br.com.yagovcb.vendedorapi.application.exceptions.ConflictException;
 import br.com.yagovcb.vendedorapi.application.service.CadastroVendedorStatusService;
 import br.com.yagovcb.vendedorapi.application.service.VendedorService;
 import br.com.yagovcb.vendedorapi.infrastructure.request.AtualizaVendedorRequest;
 import br.com.yagovcb.vendedorapi.infrastructure.request.CadastroVendedorRequest;
+import br.com.yagovcb.vendedorapi.infrastructure.response.CadastroStatusResponse;
 import br.com.yagovcb.vendedorapi.infrastructure.response.VendedorResponse;
+import br.com.yagovcb.vendedorapi.utils.VendedorUtils;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,14 +35,14 @@ public class VendedorController {
         return vendedorService.findAll();
     }
 
-    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<VendedorResponse> buscaPorId(@PathVariable("id") Long id) {
+    @GetMapping(value = "/{documento}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<VendedorResponse> buscaPorId(@PathVariable("documento") String documento) {
         log.info("PessoaController :: Iniciando a API para buscar objeto por id...");
-        return vendedorService.findById(id);
+        return vendedorService.findById(documento);
     }
 
     @GetMapping(value = "/{documento}/status", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> buscaVendedorStatus(@PathVariable("documento") String documento) {
+    public ResponseEntity<CadastroStatusResponse> buscaVendedorStatus(@PathVariable("documento") String documento) {
         log.info("PessoaController :: Iniciando a API para buscar objeto por documento...");
         return cadastroVendedorStatusService.buscaVendedorStatus(documento);
     }
@@ -45,20 +50,26 @@ public class VendedorController {
     @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> cadastra(@RequestBody CadastroVendedorRequest cadastroVendedorRequest) {
         log.info("PessoaController :: Iniciando a API para persistir objeto...");
-        vendedorService.cadastra(cadastroVendedorRequest);
-        return ResponseEntity.accepted().body("Cadastro em processamento");
+        if (Boolean.TRUE.equals(vendedorService.validaVendedorJaExistente(cadastroVendedorRequest.getDocumento()))){
+            throw new ConflictException(APIExceptionCode.RESOURCE_ALREADY_EXISTS, "Vendedor já cadastrado na base...");
+        } else if (!VendedorUtils.validaDocumentoVendedor(cadastroVendedorRequest.getDocumento())) {
+            throw new BusinessException(APIExceptionCode.CONSTRAINT_VALIDATION, "Documento não segue o padrão definido!");
+        } else {
+            vendedorService.cadastra(cadastroVendedorRequest);
+            return ResponseEntity.accepted().body("Cadastro em processamento");
+        }
     }
 
-    @PatchMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<HttpStatus> atualizaVendedor(@PathVariable("id") Long id, @RequestBody AtualizaVendedorRequest atualizaVendedorRequest) {
+    @PatchMapping(value = "/{documento}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<HttpStatus> atualizaVendedor(@PathVariable("documento") String documento, @RequestBody AtualizaVendedorRequest atualizaVendedorRequest) {
         log.info("PessoaController :: Iniciando a API para atualizar a pessoa...");
-        return vendedorService.atualizaVendedor(id, atualizaVendedorRequest);
+        return vendedorService.atualizaVendedor(documento, atualizaVendedorRequest);
     }
 
 
-    @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<HttpStatus> deleta(@PathVariable("id") Long id) {
+    @DeleteMapping(value = "/{documento}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<HttpStatus> deleta(@PathVariable("documento") String documento) {
         log.info("PessoaController :: Iniciando a API para deletar motorista da base...");
-        return vendedorService.deleta(id);
+        return vendedorService.deleta(documento);
     }
 }

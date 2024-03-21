@@ -1,6 +1,7 @@
 package br.com.yagovcb.vendedorapi.application.service;
 
 import br.com.yagovcb.vendedorapi.application.enums.APIExceptionCode;
+import br.com.yagovcb.vendedorapi.application.exceptions.BusinessException;
 import br.com.yagovcb.vendedorapi.application.exceptions.IntegrationException;
 import br.com.yagovcb.vendedorapi.domain.model.Filial;
 import br.com.yagovcb.vendedorapi.infrastructure.integration.response.FilialResponse;
@@ -48,8 +49,8 @@ public class VendedorService {
         return ResponseEntity.ok(response);
     }
 
-    public ResponseEntity<VendedorResponse> findById(Long id) {
-        Vendedor vendedor = retornaVendedor(id);
+    public ResponseEntity<VendedorResponse> findById(String documento) {
+        Vendedor vendedor = retornaVendedor(documento);
         FilialResponse filialResponse = retornaFilialResponse(vendedor.getFilial().getId());
         return ResponseEntity.ok(VendedorUtils.montaVendedorResponse(vendedor, filialResponse.getNome()));
     }
@@ -59,9 +60,9 @@ public class VendedorService {
         Long id = cadastroVendedorStatusService.cadastraStatusNovo(cadastroVendedorRequest.getDocumento());
         log.info("VendedorService :: Iniciando criação do vendedor na base...");
         log.info("VendedorService :: Iniciando validação do email...");
-        VendedorUtils.validaEmail(cadastroVendedorRequest.getEmail());
-        log.info("VendedorService :: Email validado, seguindo fluxo da API...");
         try {
+            VendedorUtils.validaEmail(cadastroVendedorRequest.getEmail());
+            log.info("VendedorService :: Email validado, seguindo fluxo da API...");
             Filial filial = filialIntegrationService.findByCnpj(cadastroVendedorRequest.getFilialCnpj());
             Vendedor vendedor = VendedorUtils.montaVendedorDefault(cadastroVendedorRequest,filial);
             log.info("VendedorService :: Vendedor criado, iniciando geração da matricula");
@@ -79,11 +80,15 @@ public class VendedorService {
         }
     }
 
-    public ResponseEntity<HttpStatus> atualizaVendedor(Long id, AtualizaVendedorRequest atualizaVendedorRequest) {
+    public ResponseEntity<HttpStatus> atualizaVendedor(String documento, AtualizaVendedorRequest atualizaVendedorRequest) {
+        if (Boolean.TRUE.equals(validaVendedorJaExistente(documento))){
+            throw new NotFoundException("Vendedor, com documento passado, não existe na base");
+        }
+
         log.info("VendedorService :: Iniciando validação do email...");
         VendedorUtils.validaEmail(atualizaVendedorRequest.getEmail());
         log.info("VendedorService :: Email validado, seguindo fluxo da API...");
-        Vendedor vendedor = retornaVendedor(id);
+        Vendedor vendedor = retornaVendedor(documento);
         try {
             log.info("VendedorService :: Iniciando atualização do objeto...");
             vendedorRepository.save(VendedorUtils.atualizaVendedor(vendedor, atualizaVendedorRequest));
@@ -94,8 +99,11 @@ public class VendedorService {
         }
     }
 
-    public ResponseEntity<HttpStatus> deleta(Long id) {
-        Vendedor vendedor = retornaVendedor(id);
+    public ResponseEntity<HttpStatus> deleta(String documento) {
+        if (Boolean.TRUE.equals(validaVendedorJaExistente(documento))){
+            throw new NotFoundException("Vendedor, com documento passado, não existe na base");
+        }
+        Vendedor vendedor = retornaVendedor(documento);
         log.info("VendedorService :: Iniciando a deleção do objeto...");
         try {
             vendedorRepository.delete(vendedor);
@@ -104,6 +112,10 @@ public class VendedorService {
         } catch (IntegrationException e) {
             throw new IntegrationException(APIExceptionCode.UNKNOWN, e.getMessage());
         }
+    }
+
+    public Boolean validaVendedorJaExistente(String documento){
+        return vendedorRepository.existsByDocumento(documento);
     }
 
     private FilialResponse retornaFilialResponse(Long id){
@@ -116,8 +128,8 @@ public class VendedorService {
         }
     }
 
-    private Vendedor retornaVendedor(Long id){
-        Optional<Vendedor> optionalVendedor = vendedorRepository.findById(id);
+    private Vendedor retornaVendedor(String documento){
+        Optional<Vendedor> optionalVendedor = vendedorRepository.findByDocumento(documento);
         if (optionalVendedor.isEmpty()){
             throw new NotFoundException("Vendedor não encontrada na base...");
         }

@@ -15,6 +15,8 @@ import java.util.Optional;
 public interface VendedorRepository extends JpaRepository<Vendedor, Long> {
     Optional<Vendedor> findByDocumento(String documento);
 
+    boolean existsByDocumento(String documento);
+
     @Modifying
     @Transactional
     @Query(value = "update Vendedor v set v.matricula = :matricula where v.id = :id")
