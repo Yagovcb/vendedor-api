@@ -38,7 +38,7 @@ public class VendedorController {
     @GetMapping(value = "/{documento}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<VendedorResponse> buscaPorId(@PathVariable("documento") String documento) {
         log.info("PessoaController :: Iniciando a API para buscar objeto por id...");
-        return vendedorService.findById(documento);
+        return vendedorService.findByDocumento(documento);
     }
 
     @GetMapping(value = "/{documento}/status", produces = MediaType.APPLICATION_JSON_VALUE)

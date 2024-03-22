@@ -49,7 +49,7 @@ public class VendedorService {
         return ResponseEntity.ok(response);
     }
 
-    public ResponseEntity<VendedorResponse> findById(String documento) {
+    public ResponseEntity<VendedorResponse> findByDocumento(String documento) {
         Vendedor vendedor = retornaVendedor(documento);
         FilialResponse filialResponse = retornaFilialResponse(vendedor.getFilial().getId());
         return ResponseEntity.ok(VendedorUtils.montaVendedorResponse(vendedor, filialResponse.getNome()));
@@ -118,7 +118,7 @@ public class VendedorService {
         return vendedorRepository.existsByDocumento(documento);
     }
 
-    private FilialResponse retornaFilialResponse(Long id){
+    public FilialResponse retornaFilialResponse(Long id){
         ResponseEntity<FilialResponse> responseEntity = filialIntegrationService.findById(id);
         if (responseEntity.getStatusCode().is2xxSuccessful() && responseEntity.getBody() != null){
             log.info("VendedorService :: Retornando filial para o fluxo...");
@@ -128,7 +128,10 @@ public class VendedorService {
         }
     }
 
-    private Vendedor retornaVendedor(String documento){
+    public Vendedor retornaVendedor(String documento){
+        if (!VendedorUtils.validaDocumentoVendedor(documento)) {
+            throw new BusinessException(APIExceptionCode.CONSTRAINT_VALIDATION, "Documento não segue o padrão definido!");
+        }
         Optional<Vendedor> optionalVendedor = vendedorRepository.findByDocumento(documento);
         if (optionalVendedor.isEmpty()){
             throw new NotFoundException("Vendedor não encontrada na base...");
